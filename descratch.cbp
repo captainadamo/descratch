@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="descratch" />
+		<Option makefile="makefile" />
+		<Option pch_mode="0" />
+		<Option compiler="msvctk" />
+		<Build>
+			<Target title="Win32 Release">
+				<Option output="Release\descratch.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="Release" />
+				<Option type="3" />
+				<Option compiler="msvctk" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="/MT" />
+					<Add option="/W3" />
+					<Add option="/GX" />
+					<Add option="/O2" />
+					<Add option="/DWIN32" />
+					<Add option="/DNDEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_MBCS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/Ddescratch_EXPORTS" />
+					<Add option="/YX" />
+					<Add option="/FD" />
+					<Add option="/FR" />
+				</Compiler>
+			</Target>
+			<Target title="Win32 Debug">
+				<Option output="Debug\descratch.dll" prefix_auto="0" extension_auto="0" />
+				<Option object_output="Debug" />
+				<Option type="3" />
+				<Option compiler="msvctk" />
+				<Option createDefFile="1" />
+				<Option createStaticLib="1" />
+				<Compiler>
+					<Add option="/MTd" />
+					<Add option="/W3" />
+					<Add option="/Gm" />
+					<Add option="/GX" />
+					<Add option="/ZI" />
+					<Add option="/Od" />
+					<Add option="/DWIN32" />
+					<Add option="/D_DEBUG" />
+					<Add option="/D_WINDOWS" />
+					<Add option="/D_MBCS" />
+					<Add option="/D_USRDLL" />
+					<Add option="/Ddescratch_EXPORTS" />
+					<Add option="/YX" />
+					<Add option="/FD" />
+					<Add option="/GZ" />
+				</Compiler>
+			</Target>
+		</Build>
+		<VirtualTargets>
+			<Add alias="All" targets="Win32 Release;Win32 Debug;" />
+		</VirtualTargets>
+		<Unit filename="avisynth.h" />
+		<Unit filename="descratch.cpp" />
+		<Unit filename="descratch.h" />
+		<Unit filename="descratch.rc">
+			<Option compilerVar="WINDRES" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<envvars />
+			<debugger />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
