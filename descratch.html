@@ -8,7 +8,7 @@
 <body>
 <h1>DeScratch - Scratches Removing Filter</h1>
 <p>Plugin for <a href="http://www.avisynth.org">AviSynth 2.5</a><br>
-Version 0.9.1)<br>
+Version 1.0)<br>
 Copyright (C)2003-2016 Alexander G. Balakhnin aka Fizick<br>
 <a href="http://avisynth.org.ru">http://avisynth.org.ru</a><br>
 <h3>Purpose</h3>
@@ -17,38 +17,36 @@ can be used for removing of horizontal noise lines such as drop-outs
 from analog VHS captures (after image rotation). 
 <h3>How it works</h3>
 <p>The plugin firstly detects scratches, then removes them.<br>
-It works with every frame, uses spatial information only from current frame.<br>
+It uses spatial information only from current frame.<br>
 I adapt it to restoration of my old 8 mm films, may be it will be useful to somebody else.</p>
 <h4>Scratch detecting</h4>
 <p>Apply some vertical blur to frame copy, for suppression of image thin structure, inclined lines and noise.<br>
-Search for local extremes of luma in every row, with luma difference criterion.<br>
-Put these extremes in some map (frame).<br>
-Optional close vertical gaps in extrems by vertical expanding of extreme points.<br>
-Test extremes map with length and angle criterions, so select real long scratches only.</p>
+Search for local extremes of luma in every row with luma difference criterion for scratches with width not above a max.<br>
+Put these extremes in some map (frame). Search and deactivate extrems for width below a min (optional).<br>
+Optionally close vertical gaps in extrems by vertical expanding of extreme points.<br>
+Test the extremes map with length and angle criterions, so select real long scratches only.</p>
 <h4>Scratch removing</h4>
 <p>Scratches may be either partially transparent, smooth (with image details), or opaque (with no details or almost destroyed).<br>
 In the first case, plugin can subtract smooth (blurred) part of luma scratches variation from original image. Therefore, image details are kept.<br>
 In the second case, plugin replaces scratched pixels by mean luma values from some neighbours pixels (in same row).<br>
 We have also intermediate case by setting some percent of detail to keep.<br>
-The plugin have some adaptation of keeped value according to pixels luma difference.<br>
-In all cases, some nearest neighbours may also partially changed for more smoothed transition.</p>
+In all cases, some nearest neighbours pixels may be also partially changed for smooth transition.</p>
 <h3>Needed software</h3>
 <p>The program is plugin (filter) for free  Avisynth 2.5.<br>
-Tested with version 2.55beta (some versions have bug with Turnleft()! ).<br>
-Filter versions above 0.2 is no more needed in Avisynth C Interface (avithynth_c.dll) by Kevin Atkinson.<br>
+Tested with versions 2.55beta to 2.5.8. Should work for Avisynth 2.6.0 too.<br>
 Compiled with  MS VC++ Toolkit 2003.</p>
 <h3>Calling syntax</h3>
 <p><code>DeScratch</code>(<var>int mindif, int asym, int maxgap, int maxwidth, int minlen, int maxlen, int maxangle, int blurlen, int keep, int border, 
-int modeY, int modeU, int modeV, int mindifUV, bool mark</var>)</p>
+int modeY, int modeU, int modeV, int mindifUV, bool mark, int minwidth, int left, int right</var>)</p>
 <p>All parameters are named and optional.</p>
 <h3>Plugin Parameters</h3>
 <p><var>mindif</var> - minimal difference of pixel value in scratch from neighbours pixels for luma plane<br>
 &nbsp;&nbsp;&nbsp; (from 1 to 255, default 5):<br>
 <var>asym</var> - maximal asymmetry of neighbors pixels (from 0 to 255, default 10)<br>
 <var>maxgap</var> - maximal vertical gap to be closed (from 0 to 255, default 3)<br>
-<var>maxwidth</var> - maximal scratch width (1 or 3, default=3)<br>
+<var>maxwidth</var> - maximal scratch width (odd from 1 to 15, default=3)<br>
 <var>minlen</var> - minimal scratch length (default = 100)<br>
-<var>maxlen</var> - maximal scratch length (default = 1000)<br>
+<var>maxlen</var> - maximal scratch length (default = 2048)<br>
 <var>maxangle</var> - maximal angle to vertical (in degrees, default = 5)<br>
 <var>blurlen</var> - radius of vertical blur for frame analysis (default = 15)<br>
 <var>keep</var> - percent of scratch detail to keep (default = 100)<br>
@@ -61,9 +59,14 @@ int modeY, int modeU, int modeV, int mindifUV, bool mark</var>)</p>
 &nbsp;&nbsp;&nbsp; (from 0 to 255, default 0):<br>
 &nbsp;&nbsp;&nbsp; if = 0, then internal <var>mindifUV</var> value is same as <var>mindif</var>.<br>
 <var>mark</var> - mark scratch in debug mode (true or false, default = false)<br>
-&nbsp;&nbsp;&nbsp; (set rejected extrems pixels to grey, set scratches pixels to white or black)</p>
+&nbsp;&nbsp;&nbsp; (set rejected extrems pixels to grey, set scratches pixels to white or black)<br>
+<var>minwidth</var> - minimal scratch width (odd from 1 to 15, default=1)<br>
+<var>left</var> - left margin of processing window (inclusive), default=0<br>
+<var>right</var> - right margin of processing window (exclusive), default=frame width or 4096<br>
+</p>
 <p>
-<var>maxgap</var>, <var>maxwidth</var>, <var>minlen</var>, <var>blurlen</var>, <var>border</var> 
+<var>maxgap</var>, <var>maxwidth</var>, <var>minwidth</var>, <var>minlen</var>, <var>blurlen</var>, 
+<var>border</var>,  <var>left</var>, <var>right</var> 
 should be given in pixels.</p>
 <p>You MUST tune parameters for your video.<br> 
 Use AviSynth commands <code>Greyscale(), UtoY(), VtoY()</code>, and <var>mark</var> parameter for debug and tuning.</p>
@@ -101,7 +104,7 @@ TurnRight()
 Weave() # restore fields
 # Compare source frame and frame after scratch removing
 StackVertical(input, last)</pre>
-<p> Optimal Descratch parameters used - big <var>minlen</var>, null <var>maxangle</var>):</p>
+<p> Optimal Descratch parameters used - big <var>minlen</var>, null <var>maxangle</var>.</p>
 <p>For color line dropouts removing, you can use <var>modeU</var>, <var> modeV</var> and
 <var> mindifUV</var> parameters.</p>
 <h3>More info</h3>
@@ -112,7 +115,7 @@ StackVertical(input, last)</pre>
 Please donate for support.</p>
 <h3>Version changes log:</h3>
 <ul>
-  <li>Version 0.1, 22 December 2003 - initial beta (not public)</li>
+  <li>Version 0.1, 22 December 2003 - initial beta (not public). Use Avisynth C Interface.</li>
   <li>Version 0.2, 31 December 2003 - first public
     <ul>
       <li>changed to sharp extrems;</li>
@@ -148,15 +151,16 @@ Please donate for support.</p>
   <li>Version 0.9.0, June 15, 2005 - documentation re-formatted</li>
   <li>Version 0.9.0.0, September 09, 2006 - source code licensed under GNU GPL v2</li>
   <li>Version 0.9.1, February 02, 2016 -  fixed scratch border</li>
+  <li>Version 1.0, February 05, 2016 -  more maxwidth values, added miwindth, left and right margins, improved detecting, 
+  removed adaptation of kept value to pixels luma difference.</li>
 
 </ul>
+<h3>Current version limitations:</h3>
+<p>The plugin works only in YV12.</p>
 <h3>Download</h3>
 <cite>
-<p><a href="descratch091.zip">Download DeScratch version 0.9.1</a></p>
+<p><a href="descratch100.zip">Download DeScratch version 1.0</a></p>
 </cite>
-<h3>Current version limitations:</h3>
-<p>Maximal scratch width is fixed to 1 or 3.<br>
-The plugin works only in YV12.</p>
 <p><a href="../">Return to main page</a></p>
 </body>
 </html>
