@@ -839,13 +839,15 @@ void remove_scratches_plane(const BYTE * src_data, int src_pitch, BYTE * dest_da
   BYTE *d;
   d = scratchdata;
 //  int h, row;
-  int background,blured_background;
+//  int background,blured_background;
   int i;
   int rad = maxwidth/2;  // 3/2=1
   int left, rowc;
 
 
   int keep256 = (keep100*256)/100; // to norm 256
+
+  int div2rad2 = (256*256)/(2*rad+2); // to div by 2*rad+2, replace division by mult and shift
 
 
     for (int h=0; h<height; h+=1)
@@ -860,27 +862,24 @@ void remove_scratches_plane(const BYTE * src_data, int src_pitch, BYTE * dest_da
 		   {        // the scratch right
        	   	rowc = (left+row)/2;                                // the scratch center
 
-       	           blured_background = (blured_data[rowc-rad-border-1] + blured_data[rowc+rad+border+1])/2;
-       	           background = (src_data[rowc-rad-border-1] + src_data[rowc+rad+border+1])/2;
        	           for (i=-rad; i<=rad; i +=1)
 				   {          // in scratch
-       	           	 int dif = blured_background - blured_data[rowc+i];
-//       	           	 int keepc = (keep256*256)/( 256 + abs((dif*256)/(mindif1*4)) ) ;  // decreese KEEPC for large difference
-       	           	 int keepc = keep256; // do not decreaase KEEPC v.1.0
-					int newdata1 = ((keepc*(src_data[rowc+i] + dif)) + (256-keepc)*background)/256;
-       	           	 dest_data[rowc+i] = min(255,max(0,newdata1)); // clipped in v.0.6
+					int newdata1 = ((keep256*(src_data[rowc+i] + blured_data[rowc-rad-border-1] - blured_data[rowc+i])) + (256-keep256)*src_data[rowc-rad-border-1])/256;
+					int newdata2 = ((keep256*(src_data[rowc+i] + blured_data[rowc+rad+border+1] - blured_data[rowc+i])) + (256-keep256)*src_data[rowc+rad+border+1])/256;
+					int newdata = ((newdata1*(rad-i+1) + newdata2*(rad+i+1))*div2rad2)/(256*256); // weighted left and right - v1.1
+       	           	 dest_data[rowc+i] = min(255,max(0, newdata)); // clipped in v.0.6
        	           }
        	           for (i=-rad-border; i<-rad; i +=1)
 				   {         // at left border
-//					int newdata2 = src_data[rowc+i] + blured_background - blured_data[rowc+i]; // fix v.0.9.1
-					int newdata2 = src_data[rowc+i] + blured_data[rowc-rad-border-1] - blured_data[rowc+i]; // v.1.0
-       	           	 dest_data[rowc+i] = min(255,max(0,newdata2)); // clipped in v.0.6
+					int newdata = src_data[rowc+i] + blured_data[rowc-rad-border-1] - blured_data[rowc+i]; // fix v.0.9.1
+					newdata = (keep256*newdata + (256-keep256)*src_data[rowc-rad-border-1])/256; //v1.1
+       	           	 dest_data[rowc+i] = min(255,max(0,newdata)); // clipped in v.0.6
        	           }
        	           for (i=rad+1; i<=rad+border; i +=1)
 				   {         // at right border
-//					int newdata3 = src_data[rowc+i] + blured_background - blured_data[rowc+i]; // fix v.0.9.1
-					int newdata3 = src_data[rowc+i] + blured_data[rowc+rad+border+1] - blured_data[rowc+i]; // v.1.0
-       	           	 dest_data[rowc+i] = min(255,max(0,newdata3)); // clipped in v.0.6
+					int newdata = src_data[rowc+i] + blured_data[rowc+rad+border+1] - blured_data[rowc+i]; // fix v.0.9.1
+					newdata = (keep256*newdata + (256-keep256)*src_data[rowc+rad+border+1])/256; // v.1.1
+       	           	 dest_data[rowc+i] = min(255,max(0,newdata)); // clipped in v.0.6
        	           }
 			left=0; // v.0.9.1
        	   }
