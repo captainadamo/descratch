@@ -1038,10 +1038,14 @@ AVSValue __cdecl Create_DeScratch(AVSValue args, void* user_data, IScriptEnviron
     // Calls the constructor with the arguments provided.
 }
 
+const AVS_Linkage *AVS_linkage = 0;
+
 // The following function is the function that actually registers the filter in AviSynth
 // It is called automatically, when the plugin is loaded to see which functions this filter contains.
 
-extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit2(IScriptEnvironment* env) {
+extern "C" __declspec(dllexport) const char* __stdcall AvisynthPluginInit3(IScriptEnvironment* env, const AVS_Linkage* const vectors) {
+	AVS_linkage = vectors;
+
     env->AddFunction("descratch", "c[mindif]i[asym]i[maxgap]i[maxwidth]i[minlen]i[maxlen]i[maxangle]f[blurlen]i[keep]i[border]i[modeY]i[modeU]i[modeV]i[mindifUV]i[mark]b[minwidth]i[left]i[right]i", Create_DeScratch, 0);
     // The AddFunction has the following parameters:
     // AddFunction(Filtername , Arguments, Function to call,0);
