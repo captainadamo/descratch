@@ -36,9 +36,10 @@ The plugin works only in YV12.
 
 */
 
-#include "windows.h"
-#include "avisynth.h"
 #include <cstdint>
+#include <cstdlib>
+#include "avisynth.h"
+#include <avs/minmax.h>
 
 #define SD_NULL 0
 #define SD_EXTREM 1
