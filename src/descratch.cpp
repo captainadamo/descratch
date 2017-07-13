@@ -565,7 +565,7 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
     if (removewidth == 0) return;
 
     if (mindif > 0) {
-        // Previous code would only do anything for odd values that were less than 15
+        // Previous code would only do anything for odd values <= 15
         // Instead of needless looping just return if removewidth is even or greater than 15
         if ((removewidth % 2 == 0) || removewidth > 15) return;
 
@@ -586,8 +586,8 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
             d += row_size;
         }
     } else { // white (high value) scratches
-        // Previous code would only do anything for odd values that were less than 15
-        // Instead of needless looping just return if removewidth is even or greater than 15
+        // Previous code would only do anything for odd values <= 13
+        // Instead of needless looping just return if removewidth is even or greater than 13
         if ((removewidth % 2 == 0) || removewidth > 13) return;
 
         for (int h = 0; h < height; h += 1) {
