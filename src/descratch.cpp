@@ -62,7 +62,7 @@ class DeScratch : public GenericVideoFilter {
     int maxwidth;
     int minlen;
     int maxlen;
-    float maxangle;
+    double maxangle;
     int blurlen;
     int keep;
     int border;
@@ -83,8 +83,8 @@ class DeScratch : public GenericVideoFilter {
     int width;
     int height;
 
-    void DeScratch::DeScratch_pass(const uint8_t* srcp, int src_pitch, const uint8_t* blurredp, int blurred_pitch,
-                                   uint8_t* destp, int dest_pitch, int row_sizep, int heightp, int hscale, int mindifp, int asym);
+    void DeScratch_pass(const uint8_t* srcp, int src_pitch, const uint8_t* blurredp, int blurred_pitch,
+                        uint8_t* destp, int dest_pitch, int row_sizep, int heightp, int hscale, int mindifp, int asym);
 
 public:
     // This defines that these functions are present in your class.
@@ -93,7 +93,7 @@ public:
     // Otherwise they can only be called from functions within the class itself.
 
     DeScratch(PClip _child, int _mindif, int _asym, int _maxgap, int _maxwidth,
-              int _minlen, int _maxlen, float _maxangle, int _blurlen, int _keep,
+              int _minlen, int _maxlen, double _maxangle, int _blurlen, int _keep,
               int _border, int _modeY, int _modeU, int _modeV, int _mindifUV, bool _mark,
               int _minwidth, int _wleft, int _wright, IScriptEnvironment* env);
     // This is the constructor. It does not return any value, and is always used,
@@ -109,7 +109,7 @@ public:
 
 //Here is the actual constructor code used
 DeScratch::DeScratch(PClip _child, int _mindif, int _asym, int _maxgap, int _maxwidth,
-                     int _minlen, int _maxlen, float _maxangle, int _blurlen, int _keep,
+                     int _minlen, int _maxlen, double _maxangle, int _blurlen, int _keep,
                      int _border, int _modeY, int _modeU, int _modeV, int _mindifUV,
                      bool _mark, int _minwidth, int _wleft, int _wright, IScriptEnvironment* env) :
     GenericVideoFilter(_child), mindif(_mindif), asym(_asym), maxgap(_maxgap), maxwidth(_maxwidth),
@@ -735,7 +735,7 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
     }
 }
 
-void  close_gaps(uint8_t* scratchdata, int rows, int height, int maxgap)
+void close_gaps(uint8_t* scratchdata, int rows, int height, int maxgap)
 {
     uint8_t* d = scratchdata;
 
@@ -752,7 +752,7 @@ void  close_gaps(uint8_t* scratchdata, int rows, int height, int maxgap)
     }
 }
 
-void  test_scratches(uint8_t* scratchdata, int rows, int height, int maxwidth, int minlens, int maxlens, float maxangle)
+void test_scratches(uint8_t* scratchdata, int rows, int height, int maxwidth, int minlens, int maxlens, double maxangle)
 {
     uint8_t* d = scratchdata;
 
@@ -834,7 +834,7 @@ void  test_scratches(uint8_t* scratchdata, int rows, int height, int maxwidth, i
     }   //end for h
 }
 
-void  mark_scratches_plane(uint8_t* dest_data, int dest_pitch, int row_size, int height, uint8_t* scratchdata, int mask, int value)
+void mark_scratches_plane(uint8_t* dest_data, int dest_pitch, int row_size, int height, uint8_t* scratchdata, int mask, int value)
 {
     for (int h = 0; h < height; h += 1) {
         for (int row = 0; row < row_size; row += 1) {
@@ -850,7 +850,7 @@ void  mark_scratches_plane(uint8_t* dest_data, int dest_pitch, int row_size, int
 
 void remove_scratches_plane(const uint8_t* src_data, int src_pitch, uint8_t* dest_data, int dest_pitch,
                             const uint8_t* blurred_data, int blurred_pitch, int row_size, int height,
-                            uint8_t* scratchdata, int mindif1, int maxwidth, int keep100, int border)
+                            uint8_t* scratchdata, int maxwidth, int keep100, int border)
 {
     uint8_t* d = scratchdata;
     int rad = maxwidth / 2; // 3/2=1
@@ -926,7 +926,7 @@ void DeScratch::DeScratch_pass(const uint8_t* srcp, int src_pitch, const uint8_t
         mark_scratches_plane(destp, dest_pitch, row_sizep, heightp, scratchdata, SD_REJECT, markvalue);
     } else {
         remove_scratches_plane(srcp, src_pitch, destp, dest_pitch, blurredp, blurred_pitch,
-                               row_sizep, heightp, scratchdata, mindifp, maxwidth, keep, border);
+                               row_sizep, heightp, scratchdata, maxwidth, keep, border);
     }
 }
 
