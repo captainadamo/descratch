@@ -560,91 +560,25 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
     uint8_t* d = scratchdata;
     int removewidth = minwidth - 2;
 
+    // Previous code would do needless looping over the entire height of image if removewidth was 0
+    // Instead of needlessly looping just return
+    if (removewidth == 0) return;
+
     if (mindif > 0) {
+        // Previous code would only do anything for odd values that were less than 15
+        // Instead of needless looping just return if removewidth is even or greater than 15
+        if ((removewidth % 2 == 0) || removewidth > 15) return;
+
         // black (low value) scratches
         for (int h = 0; h < height; h += 1) {
-            switch (removewidth) {
-            case 0:
-            default:
-                break;
+            int initalRowOffset = (removewidth + 3) / 2;
 
-            case 1:
-                for (int row = 2; row < row_size - 2; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 1] - s[row] > mindif) && (s[row + 1] - s[row] > mindif)
-                        && (abs(s[row - 2] - s[row + 2]) <= asym) // added in v.0.7
-                        && (s[row - 1] - s[row] + s[row + 1] - s[row] > s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1])) { // changed v1.0
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 3:
-                for (int row = 3; row < row_size - 3; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 2] - s[row] > mindif) && (s[row + 2] - s[row] > mindif)
-                        && (abs(s[row - 3] - s[row + 3]) <= asym)  // added in v.0.7
-                        && (s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1] > s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2])) { // changed v1.0
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 5:
-                for (int row = 4; row < row_size - 4; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 3] - s[row] > mindif) && (s[row + 3] - s[row] > mindif)
-                        && (abs(s[row - 4] - s[row + 4]) <= asym)
-                        && (s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2] > s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 7: // v1.0
-                for (int row = 5; row < row_size - 5; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 4] - s[row] > mindif) && (s[row + 4] - s[row] > mindif)
-                        && (abs(s[row - 5] - s[row + 5]) <= asym)
-                        && (s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3] > s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 9: // v1.0
-                for (int row = 6; row < row_size - 6; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 5] - s[row] > mindif) && (s[row + 5] - s[row] > mindif)
-                        && (abs(s[row - 6] - s[row + 6]) <= asym)
-                        && (s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4] > s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 11: // v1.0
-                for (int row = 7; row < row_size - 7; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 6] - s[row] > mindif) && (s[row + 6] - s[row] > mindif)
-                        && (abs(s[row - 7] - s[row + 7]) <= asym)
-                        && (s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5] > s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 13: // v1.0
-                for (int row = 8; row < row_size - 8; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 7] - s[row] > mindif) && (s[row + 7] - s[row] > mindif)
-                        && (abs(s[row - 8] - s[row + 8]) <= asym)
-                        && (s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6] > s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 15: // v1.0
-                for (int row = 9; row < row_size - 9; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 8] - s[row] > mindif) && (s[row + 8] - s[row] > mindif)
-                        && (abs(s[row - 9] - s[row + 9]) <= asym)
-                        && (s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7] > s[row - 9] - s[row - 8] + s[row + 9] - s[row + 8])) {
-                        d[row] = SD_NULL;
-                    }
+            for (int row = initalRowOffset; row < (row_size - initalRowOffset); row += 1) {
+                if (d[row] == SD_EXTREM && (s[row - (initalRowOffset - 1)] - s[row] > mindif) && (s[row + (initalRowOffset - 1)] - s[row] > mindif)
+                    && (abs(s[row - initalRowOffset] - s[row + initalRowOffset]) <= asym)
+                    && (s[row - (initalRowOffset - 1)] - s[row - (initalRowOffset - 2)] + s[row + (initalRowOffset - 1)] - s[row + (initalRowOffset - 2)]
+                        > s[row - initalRowOffset] - s[row - (initalRowOffset - 1)] + s[row + initalRowOffset] - s[row + (initalRowOffset - 1)])) {
+                    d[row] = SD_NULL;
                 }
             }
 
@@ -652,80 +586,19 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
             d += row_size;
         }
     } else { // white (high value) scratches
+        // Previous code would only do anything for odd values that were less than 15
+        // Instead of needless looping just return if removewidth is even or greater than 15
+        if ((removewidth % 2 == 0) || removewidth > 13) return;
+
         for (int h = 0; h < height; h += 1) {
-            switch (removewidth) {
-            case 0:
-            default:
-                break;
+            int initalRowOffset = (removewidth + 3) / 2;
 
-            case 1:
-                for (int row = 2; row < row_size - 2; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 1] - s[row] < mindif) && (s[row + 1] - s[row] < mindif)
-                        && (abs(s[row - 2] - s[row + 2]) <= asym)   // added in v.0.7
-                        && (s[row - 1] - s[row] + s[row + 1] - s[row] < s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 3:
-                for (int row = 3; row < row_size - 3; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 2] - s[row] < mindif) && (s[row + 2] - s[row] < mindif)
-                        && (abs(s[row - 3] - s[row + 3]) <= asym)   // added in v.0.7
-                        && (s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1] < s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-
-            case 5: // v1.0
-                for (int row = 4; row < row_size - 4; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 3] - s[row] < mindif) && (s[row + 3] - s[row] < mindif)
-                        && (abs(s[row - 4] - s[row + 4]) <= asym)   // added in v.0.7
-                        && (s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2] < s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 7:
-                for (int row = 5; row < row_size - 5; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 4] - s[row] < mindif) && (s[row + 4] - s[row] < mindif)
-                        && (abs(s[row - 5] - s[row + 5]) <= asym)
-                        && (s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3] < s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 9:
-                for (int row = 6; row < row_size - 6; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 5] - s[row] < mindif) && (s[row + 5] - s[row] < mindif)
-                        && (abs(s[row - 6] - s[row + 6]) <= asym)
-                        && (s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4] < s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 11:
-                for (int row = 7; row < row_size - 7; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 6] - s[row] < mindif) && (s[row + 6] - s[row] < mindif)
-                        && (abs(s[row - 7] - s[row + 7]) <= asym)
-                        && (s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5] < s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6])) {
-                        d[row] = SD_NULL;
-                    }
-                }
-                break;
-
-            case 13:
-                for (int row = 8; row < row_size - 8; row += 1) {   // middle rows
-                    if (d[row] == SD_EXTREM && (s[row - 7] - s[row] < mindif) && (s[row + 7] - s[row] < mindif)
-                        && (abs(s[row - 8] - s[row + 8]) <= asym)
-                        && (s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6] < s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7])) {
-                        d[row] = SD_NULL;
-                    }
+            for (int row = initalRowOffset; row < (row_size - initalRowOffset); row += 1) {
+                if (d[row] == SD_EXTREM && (s[row - (initalRowOffset - 1)] - s[row] < mindif) && (s[row + (initalRowOffset - 1)] - s[row] < mindif)
+                    && (abs(s[row - initalRowOffset] - s[row + initalRowOffset]) <= asym)
+                    && (s[row - (initalRowOffset - 1)] - s[row - (initalRowOffset - 2)] + s[row + (initalRowOffset - 1)] - s[row + (initalRowOffset - 2)]
+                        < s[row - initalRowOffset] - s[row - (initalRowOffset - 1)] + s[row + initalRowOffset] - s[row + (initalRowOffset - 1)])) {
+                    d[row] = SD_NULL;
                 }
             }
 
