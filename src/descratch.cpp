@@ -904,93 +904,40 @@ PVideoFrame __stdcall DeScratch::GetFrame(int ndest, IScriptEnvironment* env)
     PVideoFrame blurred = blurred_clip->GetFrame(ndest, env);
 
     int sign;
-    int plane;
+    int planes[] = { PLANAR_Y, PLANAR_U, PLANAR_V };
+    int modes[] = { modeY, modeU, modeV };
 
-    plane = PLANAR_Y;
-    const uint8_t * blurredp = blurred->GetReadPtr(plane);
-    int blurred_pitch = blurred->GetPitch(plane);
-    uint8_t * destp = dest->GetWritePtr(plane);
-    int dest_pitch = dest->GetPitch(plane);
-    const uint8_t * srcp = src->GetReadPtr(plane);
-    int src_pitch = src->GetPitch(plane);
-    int row_size = src->GetRowSize(plane);
-    int heightp = src->GetHeight(plane);
-    int wleftp = wleft*row_size / width;
-    int wrightp = wright*row_size / width;
+    for (int i = 0; i < 3; ++i)
+    {
+        int plane = planes[i];
+        const uint8_t * blurredp = blurred->GetReadPtr(plane);
+        int blurred_pitch = blurred->GetPitch(plane);
+        uint8_t * destp = dest->GetWritePtr(plane);
+        int dest_pitch = dest->GetPitch(plane);
+        const uint8_t * srcp = src->GetReadPtr(plane);
+        int src_pitch = src->GetPitch(plane);
+        int row_size = src->GetRowSize(plane);
+        int heightp = src->GetHeight(plane);
+        int wleftp = wleft*row_size / width;
+        int wrightp = wright*row_size / width;
 
-    // remove scratches  for every plane and sign independently
-    if (modeY == MODE_ALL)
-    {
-        env->BitBlt(buf, buf_pitch, srcp, src_pitch, row_size, heightp);
-        DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, buf + wleftp, buf_pitch, wrightp - wleftp, heightp, height / heightp, mindif, asym);
-        env->BitBlt(destp, dest_pitch, buf, buf_pitch, row_size, heightp);
-        DeScratch_pass(buf + wleftp, buf_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, (height / heightp), (-mindif), asym);
-    }
-    else
-    {
-        env->BitBlt(destp, dest_pitch, srcp, src_pitch, row_size, heightp);
-        if (modeY == MODE_LOW || modeY == MODE_HIGH)
+        int mode = modes[i];
+        // remove scratches  for every plane and sign independently
+        if (mode == MODE_ALL)
         {
-            sign = (modeY == MODE_LOW) ? 1 : -1;
-            DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, sign*mindif, asym);
+            env->BitBlt(buf, buf_pitch, srcp, src_pitch, row_size, heightp);
+            DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, buf + wleftp, buf_pitch, wrightp - wleftp, heightp, height / heightp, mindif, asym);
+            env->BitBlt(destp, dest_pitch, buf, buf_pitch, row_size, heightp);
+            DeScratch_pass(buf + wleftp, buf_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, (height / heightp), (-mindif), asym);
         }
-    }
-
-    plane = PLANAR_U;
-    blurredp = blurred->GetReadPtr(plane);
-    blurred_pitch = blurred->GetPitch(plane);
-    destp = dest->GetWritePtr(plane);
-    dest_pitch = dest->GetPitch(plane);
-    srcp = src->GetReadPtr(plane);
-    src_pitch = src->GetPitch(plane);
-    row_size = src->GetRowSize(plane);
-    heightp = src->GetHeight(plane);
-    wleftp = wleft*row_size / width;
-    wrightp = wright*row_size / width;
-
-    if (modeU == MODE_ALL)
-    {
-        env->BitBlt(buf, buf_pitch, srcp, src_pitch, row_size, heightp);
-        DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, buf + wleftp, buf_pitch, wrightp - wleftp, heightp, height / heightp, mindifUV, asym);
-        env->BitBlt(destp, dest_pitch, buf, buf_pitch, row_size, heightp);
-        DeScratch_pass(buf + wleftp, buf_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, -mindifUV, asym);
-    }
-    else
-    {
-        env->BitBlt(destp, dest_pitch, srcp, src_pitch, row_size, heightp);
-        if (modeU == MODE_LOW || modeU == MODE_HIGH)
+        else
         {
-            sign = (modeU == MODE_LOW) ? 1 : -1;
-            DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, sign*mindifUV, asym);
-        }
-    }
-
-    plane = PLANAR_V;
-    blurredp = blurred->GetReadPtr(plane);
-    blurred_pitch = blurred->GetPitch(plane);
-    destp = dest->GetWritePtr(plane);
-    dest_pitch = dest->GetPitch(plane);
-    srcp = src->GetReadPtr(plane);
-    src_pitch = src->GetPitch(plane);
-    row_size = src->GetRowSize(plane);
-    heightp = src->GetHeight(plane);
-    wleftp = wleft*row_size / width;
-    wrightp = wright*row_size / width;
-
-    if (modeV == MODE_ALL)
-    {
-        env->BitBlt(buf, buf_pitch, srcp, src_pitch, row_size, heightp);
-        DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, buf + wleftp, buf_pitch, wrightp - wleftp, heightp, height / heightp, mindifUV, asym);
-        env->BitBlt(destp, dest_pitch, buf, buf_pitch, row_size, heightp);
-        DeScratch_pass(buf + wleftp, buf_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, -mindifUV, asym);
-    }
-    else
-    {
-        env->BitBlt(destp, dest_pitch, srcp, src_pitch, row_size, heightp);
-        if (modeV == MODE_LOW || modeV == MODE_HIGH)
-        {
-            sign = (modeV == MODE_LOW) ? 1 : -1;
-            DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, sign*mindifUV, asym);
+            env->BitBlt(destp, dest_pitch, srcp, src_pitch, row_size, heightp);
+            if (mode == MODE_LOW || mode == MODE_HIGH)
+            {
+                sign = (mode == MODE_LOW) ? 1 : -1;
+                DeScratch_pass(srcp + wleftp, src_pitch, blurredp + wleftp, blurred_pitch, destp + wleftp, dest_pitch, wrightp - wleftp, heightp, height / heightp, sign*mindif, asym);
+            }
         }
     }
 
