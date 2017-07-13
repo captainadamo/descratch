@@ -9,8 +9,7 @@ This program is FREE software under GPL license v2.
 
 This plugin removes vertical scratches from digitized films.
 
-
-         Version changes:
+Version changes:
 
 version 0.1,    December 22, 2003  - initial beta (not public)
 version 0.2,    December 31, 2003  - only sharp extremes detected, close gaps option
@@ -28,12 +27,12 @@ Version 0.9,    March 31, 2005     - allow maxwidth=1
 Version 0.9.0.0 September 09, 2006 - source licensed under GPL v2
 Version 0.9.1,  February 02, 2016  - fixed scratch border
 Version 1.0,    February 5, 2016   - more maxwidth, other changes
+Version 1.1,    February 15, 2016  - more smooth scratch borders removing
 
-  Current version limitation:
+Current version limitation:
 
 Maximum scratch width is odd from 1 to 11.
 The plugin works only in YV12.
-
 */
 
 #include <cstdint>
