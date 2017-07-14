@@ -1,6 +1,6 @@
 1 VERSIONINFO
-FILEVERSION 1, 1, 0, 0
-PRODUCTVERSION 2, 5, 0, 0
+FILEVERSION 1, 2, 0, 0
+PRODUCTVERSION 2, 6, 0, 0
 FILEFLAGSMASK 0
 FILEOS 0x40000
 FILETYPE 1
@@ -10,13 +10,13 @@ FILETYPE 1
   BLOCK "040904E4"
   {
    VALUE "CompanyName", "http://avisynth.org.ru"
-   VALUE "FileDescription", "DeScratch plugin for Avisynth 2.5 "
-   VALUE "FileVersion", "1.1"
+   VALUE "FileDescription", "DeScratch plugin for Avisynth+ r2508-MT"
+   VALUE "FileVersion", "1.2"
    VALUE "InternalName", "descratch"
-   VALUE "LegalCopyright", "(c)2003-2016 A.G.Balakhnin aka Fizick, bag@hotmail.ru"
+   VALUE "LegalCopyright", "(c)2003-2016 A.G.Balakhnin aka Fizick, bag@hotmail.ru; (c)2017 captainadamo, captainadamo@users.noreply.github.com"
    VALUE "OriginalFilename", "descratch.dll"
    VALUE "ProductName", "descratch"
-   VALUE "ProductVersion", "2.5"
+   VALUE "ProductVersion", "Avisynth+ r2508-MT"
    VALUE "Comments", "The plugin removes vertical scratches from films"
   }
  }

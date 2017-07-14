@@ -5,6 +5,9 @@ Copyright (c)2003-2016 Alexander G. Balakhnin aka Fizick
 bag@hotmail.ru
 http://avisynth.org.ru
 
+Copyright (c)2017 captainadamo
+captainadamo@users.noreply.github.com
+
 This program is FREE software under GPL license v2.
 
 This plugin removes vertical scratches from digitized films.
@@ -28,6 +31,7 @@ Version 0.9.0.0 September 09, 2006 - source licensed under GPL v2
 Version 0.9.1,  February 02, 2016  - fixed scratch border
 Version 1.0,    February 5, 2016   - more maxwidth, other changes
 Version 1.1,    February 15, 2016  - more smooth scratch borders removing
+Version 1.2,    July 14, 2017      - Change to using avisynth.h from avisynth+
 
 Current version limitation:
 
@@ -105,6 +109,10 @@ public:
 
     PVideoFrame __stdcall GetFrame(int n, IScriptEnvironment* env);
     // This is the function that AviSynth calls to get a given frame.
+
+    int __stdcall SetCacheHints(int cachehints, int frame_range) override {
+        return cachehints == CACHE_GET_MTMODE ? MT_MULTI_INSTANCE : 0;
+    }
 };
 
 //Here is the actual constructor code used

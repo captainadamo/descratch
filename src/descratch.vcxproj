@@ -24,6 +24,9 @@
   <ItemGroup>
     <ResourceCompile Include="descratch.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{F2B2385C-EFDD-4966-BA3D-5DF904B9AE65}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
