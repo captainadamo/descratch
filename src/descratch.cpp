@@ -569,14 +569,14 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
         // Instead of needless looping just return if removewidth is even or greater than 15
         if ((removewidth % 2 == 0) || removewidth > 15) return;
 
-        for (int h = 0; h < height; h += 1) {
-            int initalRowOffset = (removewidth + 3) / 2;
+        int initialRowIndex = (removewidth + 3) / 2;
 
-            for (int row = initalRowOffset; row < (row_size - initalRowOffset); row += 1) {
-                if (d[row] == SD_EXTREM && (s[row - (initalRowOffset - 1)] - s[row] > mindif) && (s[row + (initalRowOffset - 1)] - s[row] > mindif)
-                    && (abs(s[row - initalRowOffset] - s[row + initalRowOffset]) <= asym)
-                    && (s[row - (initalRowOffset - 1)] - s[row - (initalRowOffset - 2)] + s[row + (initalRowOffset - 1)] - s[row + (initalRowOffset - 2)]
-                        > s[row - initalRowOffset] - s[row - (initalRowOffset - 1)] + s[row + initalRowOffset] - s[row + (initalRowOffset - 1)])) {
+        for (int h = 0; h < height; h += 1) {
+            for (int row = initialRowIndex; row < (row_size - initialRowIndex); row += 1) {
+                if (d[row] == SD_EXTREM && (s[row - (initialRowIndex - 1)] - s[row] > mindif) && (s[row + (initialRowIndex - 1)] - s[row] > mindif)
+                    && (abs(s[row - initialRowIndex] - s[row + initialRowIndex]) <= asym)
+                    && (s[row - (initialRowIndex - 1)] - s[row - (initialRowIndex - 2)] + s[row + (initialRowIndex - 1)] - s[row + (initialRowIndex - 2)]
+                        > s[row - initialRowIndex] - s[row - (initialRowIndex - 1)] + s[row + initialRowIndex] - s[row + (initialRowIndex - 1)])) {
                     d[row] = SD_NULL;
                 }
             }
@@ -589,14 +589,14 @@ void  remove_min_extremes_plane(const uint8_t* s, int src_pitch, int row_size, i
         // Instead of needless looping just return if removewidth is even or greater than 13
         if ((removewidth % 2 == 0) || removewidth > 13) return;
 
-        for (int h = 0; h < height; h += 1) {
-            int initalRowOffset = (removewidth + 3) / 2;
+        int initialRowIndex = (removewidth + 3) / 2;
 
-            for (int row = initalRowOffset; row < (row_size - initalRowOffset); row += 1) {
-                if (d[row] == SD_EXTREM && (s[row - (initalRowOffset - 1)] - s[row] < mindif) && (s[row + (initalRowOffset - 1)] - s[row] < mindif)
-                    && (abs(s[row - initalRowOffset] - s[row + initalRowOffset]) <= asym)
-                    && (s[row - (initalRowOffset - 1)] - s[row - (initalRowOffset - 2)] + s[row + (initalRowOffset - 1)] - s[row + (initalRowOffset - 2)]
-                        < s[row - initalRowOffset] - s[row - (initalRowOffset - 1)] + s[row + initalRowOffset] - s[row + (initalRowOffset - 1)])) {
+        for (int h = 0; h < height; h += 1) {
+            for (int row = initialRowIndex; row < (row_size - initialRowIndex); row += 1) {
+                if (d[row] == SD_EXTREM && (s[row - (initialRowIndex - 1)] - s[row] < mindif) && (s[row + (initialRowIndex - 1)] - s[row] < mindif)
+                    && (abs(s[row - initialRowIndex] - s[row + initialRowIndex]) <= asym)
+                    && (s[row - (initialRowIndex - 1)] - s[row - (initialRowIndex - 2)] + s[row + (initialRowIndex - 1)] - s[row + (initialRowIndex - 2)]
+                        < s[row - initialRowIndex] - s[row - (initialRowIndex - 1)] + s[row + initialRowIndex] - s[row + (initialRowIndex - 1)])) {
                     d[row] = SD_NULL;
                 }
             }
