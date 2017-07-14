@@ -213,169 +213,31 @@ void  get_extremes_plane(const uint8_t* s, int src_pitch, int row_size, int heig
 {
     uint8_t* d = scratchdata;
 
+    int initialRowIndex = initialRowIndex = (maxwidth + 3) / 2;
+    if (maxwidth == 0 || maxwidth % 2 == 0 || maxwidth > 15) {
+        initialRowIndex = 3;
+    }
+
     if (mindif > 0) {   // black (low value) scratches
         for (int h = 0; h < height; h += 1) {
-            switch (maxwidth) {
+            for (int row = 0; row < initialRowIndex; row += 1) {
+                d[row] = SD_NULL;
+            }
 
-            case 1:// added in v 0.9
-                for (int row = 0; row < 2; row += 1) {
+            for (int row = initialRowIndex; row < row_size - initialRowIndex; row += 1) {   // middle rows
+                if ((s[row - (initialRowIndex - 1)] - s[row] > mindif) && (s[row + (initialRowIndex - 1)] - s[row] > mindif)
+                    && (abs(s[row - initialRowIndex] - s[row + initialRowIndex]) <= asym)  // added in v.0.7
+                    && (s[row - (initialRowIndex - 1)] - s[row - (initialRowIndex - 2)] + s[row + (initialRowIndex - 1)] - s[row + (initialRowIndex - 2)]
+                        > s[row - initialRowIndex] - s[row - (initialRowIndex - 1)] + s[row + initialRowIndex] - s[row + (initialRowIndex - 1)])) {
+                    d[row] = SD_EXTREM; // sharp extremum found
+                }
+                else {
                     d[row] = SD_NULL;
                 }
+            }
 
-                for (int row = 2; row < row_size - 2; row += 1) {   // middle rows
-                    if ((s[row - 1] - s[row] > mindif) && (s[row + 1] - s[row] > mindif)
-                        && (abs(s[row - 2] - s[row + 2]) <= asym)  // added in v.0.7
-                        && (s[row - 1] - s[row] + s[row + 1] - s[row] > s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1])) { // changed v1.0
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 2; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 3:
-            default:
-                for (int row = 0; row < 3; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 3; row < row_size - 3; row += 1) {   // middle rows
-                    if ((s[row - 2] - s[row] > mindif) && (s[row + 2] - s[row] > mindif)
-                        && (abs(s[row - 3] - s[row + 3]) <= asym)  // added in v.0.7
-                        && (s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1] > s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2])) { // changed v1.0
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 3; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 5: // v1.0
-                for (int row = 0; row < 4; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 4; row < row_size - 4; row += 1) {   // middle rows
-                    if ((s[row - 3] - s[row] > mindif) && (s[row + 3] - s[row] > mindif)
-                        && (abs(s[row - 4] - s[row + 4]) <= asym)
-                        && (s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2] > s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 4; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 7: // v1.0
-                for (int row = 0; row < 5; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 5; row < row_size - 5; row += 1) {   // middle rows
-                    if ((s[row - 4] - s[row] > mindif) && (s[row + 4] - s[row] > mindif)
-                        && (abs(s[row - 5] - s[row + 5]) <= asym)
-                        && (s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3] > s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 5; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 9: // v1.0
-                for (int row = 0; row < 6; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 6; row < row_size - 6; row += 1) {   // middle rows
-                    if ((s[row - 5] - s[row] > mindif) && (s[row + 5] - s[row] > mindif)
-                        && (abs(s[row - 6] - s[row + 6]) <= asym)
-                        && (s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4] > s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 6; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 11: // v1.0
-                for (int row = 0; row < 7; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 7; row < row_size - 7; row += 1) {   // middle rows
-                    if ((s[row - 6] - s[row] > mindif) && (s[row + 6] - s[row] > mindif)
-                        && (abs(s[row - 7] - s[row + 7]) <= asym)
-                        && (s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5] > s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 7; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 13: // v1.0
-                for (int row = 0; row < 8; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 8; row < row_size - 8; row += 1) {   // middle rows
-                    if ((s[row - 7] - s[row] > mindif) && (s[row + 7] - s[row] > mindif)
-                        && (abs(s[row - 8] - s[row + 8]) <= asym)
-                        && (s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6] > s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 8; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 15: // v1.0
-                for (int row = 0; row < 9; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 9; row < row_size - 9; row += 1) {   // middle rows
-                    if ((s[row - 8] - s[row] > mindif) && (s[row + 8] - s[row] > mindif)
-                        && (abs(s[row - 9] - s[row + 9]) <= asym)
-                        && (s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7] > s[row - 9] - s[row - 8] + s[row + 9] - s[row + 8])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 9; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
+            for (int row = row_size - initialRowIndex; row < row_size; row += 1) {
+                d[row] = SD_NULL;
             }
 
             s += src_pitch;
@@ -383,167 +245,24 @@ void  get_extremes_plane(const uint8_t* s, int src_pitch, int row_size, int heig
         }
     } else {   // white (high value) scratches
         for (int h = 0; h < height; h += 1) {
-            switch (maxwidth) {
+            for (int row = 0; row < initialRowIndex; row += 1) {
+                d[row] = SD_NULL;
+            }
 
-            case 1: // added in v 0.9
-                for (int row = 0; row < 2; row += 1) {
+            for (int row = initialRowIndex; row < row_size - initialRowIndex; row += 1) {   // middle rows
+                if ((s[row - (initialRowIndex - 1)] - s[row] < mindif) && (s[row + (initialRowIndex - 1)] - s[row] < mindif)
+                    && (abs(s[row - initialRowIndex] - s[row + initialRowIndex]) <= asym)  // added in v.0.7
+                    && (s[row - (initialRowIndex - 1)] - s[row - (initialRowIndex - 2)] + s[row + (initialRowIndex - 1)] - s[row + (initialRowIndex - 2)]
+                        < s[row - initialRowIndex] - s[row - (initialRowIndex - 1)] + s[row + initialRowIndex] - s[row + (initialRowIndex - 1)])) {
+                    d[row] = SD_EXTREM; // sharp extremum found
+                }
+                else {
                     d[row] = SD_NULL;
                 }
+            }
 
-                for (int row = 2; row < row_size - 2; row += 1) {   // middle rows
-                    if ((s[row - 1] - s[row] < mindif) && (s[row + 1] - s[row] < mindif)
-                        && (abs(s[row - 2] - s[row + 2]) <= asym)  // added in v.0.7
-                        && (s[row - 1] - s[row] + s[row + 1] - s[row] < s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 2; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 3:
-            default:
-                for (int row = 0; row < 3; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 3; row < row_size - 3; row += 1) {   // middle rows
-                    if ((s[row - 2] - s[row] < mindif) && (s[row + 2] - s[row] < mindif)
-                        && (abs(s[row - 3] - s[row + 3]) <= asym)  // added in v.0.7
-                        && (s[row - 2] - s[row - 1] + s[row + 2] - s[row + 1] < s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 3; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 5: // v1.0
-                for (int row = 0; row < 4; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 4; row < row_size - 4; row += 1) {   // middle rows
-                    if ((s[row - 3] - s[row] < mindif) && (s[row + 3] - s[row] < mindif)
-                        && (abs(s[row - 4] - s[row + 4]) <= asym)  // added in v.0.7
-                        && (s[row - 3] - s[row - 2] + s[row + 3] - s[row + 2] < s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 4; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 7:
-                for (int row = 0; row < 5; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 5; row < row_size - 5; row += 1) {   // middle rows
-                    if ((s[row - 4] - s[row] < mindif) && (s[row + 4] - s[row] < mindif)
-                        && (abs(s[row - 5] - s[row + 5]) <= asym)
-                        && (s[row - 4] - s[row - 3] + s[row + 4] - s[row + 3] < s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 5; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 9:
-                for (int row = 0; row < 6; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 6; row < row_size - 6; row += 1) {   // middle rows
-                    if ((s[row - 5] - s[row] < mindif) && (s[row + 5] - s[row] < mindif)
-                        && (abs(s[row - 6] - s[row + 6]) <= asym)
-                        && (s[row - 5] - s[row - 4] + s[row + 5] - s[row + 4] < s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 6; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 11:
-                for (int row = 0; row < 7; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 7; row < row_size - 7; row += 1) {   // middle rows
-                    if ((s[row - 6] - s[row] < mindif) && (s[row + 6] - s[row] < mindif)
-                        && (abs(s[row - 7] - s[row + 7]) <= asym)
-                        && (s[row - 6] - s[row - 5] + s[row + 6] - s[row + 5] < s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 7; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 13:
-                for (int row = 0; row < 8; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 8; row < row_size - 8; row += 1) {   // middle rows
-                    if ((s[row - 7] - s[row] < mindif) && (s[row + 7] - s[row] < mindif)
-                        && (abs(s[row - 8] - s[row + 8]) <= asym)
-                        && (s[row - 7] - s[row - 6] + s[row + 7] - s[row + 6] < s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 8; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
-                break;
-
-            case 15:
-                for (int row = 0; row < 9; row += 1) {
-                    d[row] = SD_NULL;
-                }
-
-                for (int row = 9; row < row_size - 9; row += 1) {   // middle rows
-                    if ((s[row - 8] - s[row] < mindif) && (s[row + 8] - s[row] < mindif)
-                        && (abs(s[row - 9] - s[row + 9]) <= asym)
-                        && (s[row - 8] - s[row - 7] + s[row + 8] - s[row + 7] < s[row - 9] - s[row - 8] + s[row + 9] - s[row + 8])) {
-                        d[row] = SD_EXTREM; // sharp extremum found
-                    } else {
-                        d[row] = SD_NULL;
-                    }
-                }
-
-                for (int row = row_size - 9; row < row_size; row += 1) {
-                    d[row] = SD_NULL;
-                }
+            for (int row = row_size - initialRowIndex; row < row_size; row += 1) {
+                d[row] = SD_NULL;
             }
 
             s += src_pitch;
